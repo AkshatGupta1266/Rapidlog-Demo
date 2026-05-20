@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | RapidLog by Xebia</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .progress-ring {
+      position: relative;
+      width: 64px;
+      height: 64px;
+    }
+    .progress-ring svg {
+      transform: rotate(-90deg);
+    }
+    .progress-ring circle {
+      fill: transparent;
+      stroke-width: 4;
+    }
+    .progress-ring-bg {
+      stroke: var(--border-divider);
+    }
+    .progress-ring-fill {
+      stroke: var(--color-purple-light);
+      stroke-dasharray: 175;
+      stroke-dashoffset: 40; /* Example progress */
+      transition: stroke-dashoffset 1s ease-in-out;
+      filter: drop-shadow(0 0 6px var(--color-purple-light));
+    }
+    .progress-text {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 14px;
+      font-weight: 700;
+    }
+    
+    .sparkline {
+      width: 100%;
+      height: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    .sparkline-path {
+      fill: none;
+      stroke: var(--color-neon-accent);
+      stroke-width: 2;
+      stroke-dasharray: 1000;
+      stroke-dashoffset: 1000;
+      animation: drawSparkline 1.5s ease-out forwards;
+      filter: drop-shadow(0 0 4px rgba(227, 49, 208, 0.5));
+    }
+    @keyframes drawSparkline {
+      to { stroke-dashoffset: 0; }
+    }
+    
+    .threat-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--spacing-3) 0;
+      border-bottom: 1px solid var(--border-divider);
+      position: relative;
+    }
+    .threat-item:last-child {
+      border-bottom: none;
+    }
+    .threat-details {
+      position: absolute;
+      right: -20px;
+      top: 50%;
+      transform: translateY(-50%) translateX(100%);
+      background: var(--bg-elevated);
+      padding: var(--spacing-3);
+      border: 1px solid var(--border-divider);
+      border-radius: var(--radius-sm);
+      opacity: 0;
+      pointer-events: none;
+      transition: all var(--transition-fast);
+      width: 200px;
+      z-index: 10;
+    }
+    .threat-item:hover .threat-details {
+      opacity: 1;
+      transform: translateY(-50%) translateX(100%) translateX(-10px); /* Micro-data on hover sliding */
+    }
+    
+    .right-sidebar {
+      grid-column: span 3;
+    }
+    .main-grid {
+      grid-column: span 9;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--spacing-5);
+    }
+    .full-width {
+      grid-column: span 2;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-left">
+      <a href="dashboard.html" class="logo" style="text-decoration: none; user-select: none;">
+        <img src="images/LOGO%20SVG.svg" alt="Xebia" style="height: 28px; pointer-events: none;" draggable="false" oncontextmenu="return false;">
+        <span style="font-weight: 400; color: var(--text-secondary);">|</span>
+        <span style="color: var(--text-primary);">RapidLog</span>
+      </a>
+      <div class="nav-links">
+        <a href="dashboard.html" class="nav-link active">Dashboard</a>
+        <a href="knowledge_hub.html" class="nav-link">Knowledge Hub</a>
+        <a href="#" class="nav-link">Alerts</a>
+        <a href="#" class="nav-link">Reports</a>
+      </div>
+    </div>
+    <div class="navbar-right">
+      <div class="status-indicator">
+        <div class="status-dot"></div>
+        <span>KB Synced</span>
+      </div>
+      <div class="user-profile" title="Akshat Gupta">AG</div>
+    </div>
+  </nav>
+
+  <main class="container">
+    
+    <div class="col-span-12 mb-4 fade-up" style="margin-bottom: var(--spacing-4);">
+      <div class="text-muted text-sm uppercase tracking-wide mb-1" style="color: var(--color-purple-light);">— Compliance Health Overview</div>
+      <h1 class="mb-1">Compliance Dashboard</h1>
+      <p class="text-secondary">Real-time status of all regulations across markets and domains.</p>
+    </div>
+
+    <!-- Hero Toolbar Area -->
+    <div class="col-span-12 toolbar fade-up stagger-1" style="padding: var(--spacing-5); border-color: rgba(183,94,184,0.3); box-shadow: 0 4px 20px rgba(0,0,0,0.3); background: rgba(22, 22, 29, 0.8); backdrop-filter: blur(12px);">
+      <div class="toolbar-row mb-4">
+        <div class="toolbar-label">Scope</div>
+        <div class="dropdown">
+          <button class="dropdown-btn interactive-pill">India <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item active">India</a>
+            <a class="dropdown-item">Europe</a>
+            <a class="dropdown-item">United States</a>
+            <a class="dropdown-item">UAE</a>
+            <a class="dropdown-item">United Kingdom</a>
+            <a class="dropdown-item">Singapore</a>
+            <a class="dropdown-item">All markets</a>
+          </div>
+        </div>
+        <div class="dropdown">
+          <button class="dropdown-btn interactive-pill">Finance <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item active">Finance</a>
+            <a class="dropdown-item">Healthcare</a>
+            <a class="dropdown-item">FMCG</a>
+            <a class="dropdown-item">Aviation</a>
+            <a class="dropdown-item">Insurance</a>
+            <a class="dropdown-item">Telecom</a>
+            <a class="dropdown-item">Retail</a>
+          </div>
+        </div>
+        <div class="text-muted text-sm ml-4" style="margin-left: 16px;">• India - Finance</div>
+      </div>
+      
+      <div class="toolbar-row mb-6">
+        <div class="toolbar-label">Quick Select</div>
+        <div class="flex flex-wrap gap-2">
+          <button class="filter-chip interactive-pill" tabindex="0">📄 RBI PA Guidelines</button>
+          <button class="filter-chip interactive-pill" tabindex="0">🇪🇺 EU GDPR</button>
+          <button class="filter-chip interactive-pill" tabindex="0">🏥 HIPAA</button>
+          <button class="filter-chip interactive-pill" tabindex="0">🔒 PCI-DSS 4.0</button>
+          <button class="filter-chip interactive-pill" tabindex="0">💳 UPI Framework</button>
+          <button class="filter-chip interactive-pill" tabindex="0">📊 SEBI CDS</button>
+          <button class="filter-chip interactive-pill" tabindex="0">🇸🇬 MAS PSA</button>
+          <button class="filter-chip interactive-pill" tabindex="0">🛡️ DPDP Act</button>
+        </div>
+      </div>
+
+      <!-- Agent Search Bar (Inside the Toolbar) -->
+      <div class="agent-bar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted mr-3" style="margin-right: 12px;">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" placeholder="Ask a compliance question, describe an epic, or search across regulations...">
+        <button class="btn btn-secondary mr-2" style="padding: 8px 12px; margin-right: 8px; border-color: rgba(255,255,255,0.1);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+        </button>
+        <button class="btn btn-primary" data-overlay-target="epicStoryOverlay" style="padding: 8px 16px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Epic & Story
+        </button>
+      </div>
+    </div>
+
+    <!-- Filters (Outside Toolbar) -->
+    <div class="col-span-12 mb-4 fade-up stagger-2 flex flex-wrap gap-2">
+      <button class="filter-chip interactive-pill active" tabindex="0">All domains</button>
+      <button class="filter-chip interactive-pill" tabindex="0">Finance</button>
+      <button class="filter-chip interactive-pill" tabindex="0">Healthcare</button>
+      <button class="filter-chip interactive-pill" tabindex="0">FMCG</button>
+      <button class="filter-chip interactive-pill" tabindex="0">Aviation</button>
+      <button class="filter-chip interactive-pill" tabindex="0">Insurance</button>
+      <button class="filter-chip interactive-pill" tabindex="0">Telecom</button>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="main-grid">
+      
+      <!-- Telemetry Card 1: Compliance Registry -->
+      <div class="card card-glass fade-up stagger-1">
+        <h3 class="mb-4">Compliance Registry</h3>
+        <div class="flex items-center gap-4">
+          <div class="progress-ring">
+            <svg width="64" height="64">
+              <circle cx="32" cy="32" r="28" class="progress-ring-bg"></circle>
+              <circle cx="32" cy="32" r="28" class="progress-ring-fill"></circle>
+            </svg>
+            <div class="progress-text">78%</div>
+          </div>
+          <div>
+            <div class="text-2xl">48</div>
+            <div class="text-muted">Total Regulations Tracked</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Telemetry Card 2: Market Health -->
+      <div class="card card-glass fade-up stagger-2">
+        <h3 class="mb-4">Market Health</h3>
+        <div class="flex justify-between items-center mb-2">
+          <div class="text-xl">Coverage</div>
+          <div class="text-success" style="color: #22C55E;">+12%</div>
+        </div>
+        <div class="sparkline">
+          <svg viewBox="0 0 100 40" preserveAspectRatio="none" style="width:100%; height:100%;">
+            <path class="sparkline-path" d="M0 30 Q 10 20 20 25 T 40 10 T 60 15 T 80 5 T 100 0"></path>
+          </svg>
+        </div>
+        <div class="flex gap-3 mt-3 items-center flex-wrap" id="market-health-list">
+          <div class="badge badge-neutral" data-market-source="🇮🇳 IN: 16"><span style="margin-right: 4px;">🇮🇳</span> IN: 16<span class="remove-badge" title="Remove">&times;</span></div>
+          
+          <div class="dropdown">
+            <button class="btn btn-secondary interactive-pill flex items-center justify-center" style="padding: 0; width: 24px; height: 24px; border-radius: 4px; border-style: dashed;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+            <div class="dropdown-menu" style="min-width: 120px; left: -40px;">
+              <a class="dropdown-item add-market-btn" data-market="🇮🇳 IN: 16" style="display: none;">🇮🇳 IN</a>
+              <a class="dropdown-item add-market-btn" data-market="🇪🇺 EU: 11">🇪🇺 EU</a>
+              <a class="dropdown-item add-market-btn" data-market="🇺🇸 US: 8">🇺🇸 US</a>
+              <a class="dropdown-item add-market-btn" data-market="🇬🇧 UK: 0">🇬🇧 UK</a>
+              <a class="dropdown-item add-market-btn" data-market="🇦🇪 UAE: 0">🇦🇪 UAE</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Telemetry Card 3: Active Threats / Alerts -->
+      <div class="card card-glass full-width fade-up stagger-3">
+        <div class="flex justify-between items-center mb-4">
+          <h3>Active Threats & Action Items</h3>
+          <a href="#">View All &rarr;</a>
+        </div>
+        
+        <div class="threat-list">
+          <div class="threat-item" tabindex="0">
+            <div class="threat-header">
+              <div class="flex items-center gap-3">
+                <div class="badge badge-critical">Critical</div>
+                <span class="text-bold">SEBI CDS change due in 18 days</span>
+              </div>
+              <span class="text-muted">Finance • India</span>
+            </div>
+            <div class="threat-details-accordion">
+              <div class="text-bold mb-2 text-sm text-primary">Affected Regulations</div>
+              <div class="text-secondary" style="font-size: 13px;">• SEBI Master Circular 2024<br>• IT Act Sec 43A</div>
+            </div>
+          </div>
+          
+          <div class="threat-item" tabindex="0">
+            <div class="threat-header">
+              <div class="flex items-center gap-3">
+                <div class="badge badge-warning">Warning</div>
+                <span class="text-bold">PSD2 SCA guidelines updated</span>
+              </div>
+              <span class="text-muted">Finance • EU</span>
+            </div>
+            <div class="threat-details-accordion">
+              <div class="text-bold mb-2 text-sm text-primary">Affected Regulations</div>
+              <div class="text-secondary" style="font-size: 13px;">• PSD2 Directive Article 97</div>
+            </div>
+          </div>
+          
+          <div class="threat-item" tabindex="0">
+            <div class="threat-header">
+              <div class="flex items-center gap-3">
+                <div class="badge badge-success">Info</div>
+                <span class="text-bold">DPDP Act rules notified</span>
+              </div>
+              <span class="text-muted">All Domains • India</span>
+            </div>
+            <div class="threat-details-accordion">
+              <div class="text-bold mb-2 text-sm text-primary">Affected Regulations</div>
+              <div class="text-secondary" style="font-size: 13px;">• DPDP Act 2023 Rules</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+
+    <!-- Right Sidebar: Recent Intelligence -->
+    <div class="right-sidebar card fade-up stagger-4">
+      <h3 class="mb-4">Recent Intelligence</h3>
+      <div class="feed-container">
+        <div class="feed-mask"></div>
+        <div class="feed-item" style="margin-top: 16px;">
+          <div class="text-bold">RBI PA Guidelines</div>
+          <div class="text-secondary">Latency mandate validation updated</div>
+          <div class="caption mt-1">2 mins ago</div>
+        </div>
+        <div class="feed-item">
+          <div class="text-bold">HIPAA Security Rule</div>
+          <div class="text-secondary">Amendment drafted for review</div>
+          <div class="caption mt-1">1 hour ago</div>
+        </div>
+        <div class="feed-item">
+          <div class="text-bold">EU GDPR</div>
+          <div class="text-secondary">Cookie consent banner requirements modified</div>
+          <div class="caption mt-1">3 hours ago</div>
+        </div>
+        <div class="feed-item">
+          <div class="text-bold">PCI-DSS 4.0</div>
+          <div class="text-secondary">New encryption standards mapped</div>
+          <div class="caption mt-1">5 hours ago</div>
+        </div>
+        <div class="feed-item">
+          <div class="text-bold">UPI Framework</div>
+          <div class="text-secondary">Recurring mandate limits changed</div>
+          <div class="caption mt-1">1 day ago</div>
+        </div>
+         <div class="feed-item">
+          <div class="text-bold">MAS PSA</div>
+          <div class="text-secondary">Singapore compliance updated</div>
+          <div class="caption mt-1">2 days ago</div>
+        </div>
+        <div class="feed-item" style="margin-bottom: 16px;">
+          <div class="text-bold">DPDP Act</div>
+          <div class="text-secondary">Data localization mapping complete</div>
+          <div class="caption mt-1">3 days ago</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Epic & Story Overlay -->
+  <div class="overlay" id="epicStoryOverlay">
+    <div class="modal" style="max-width: 900px; background: var(--bg-primary); border: 1px solid var(--border-divider);">
+      <div class="modal-header" style="border-bottom: 1px solid var(--border-divider); padding-bottom: 16px; margin-bottom: 24px;">
+        <div>
+          <h2 class="text-primary flex items-center gap-2 mb-2">
+            Turn this into an epic & story:
+          </h2>
+          <div class="flex items-center gap-3 mt-2">
+            <span class="badge" style="background: rgba(227,49,208,0.1); color: var(--color-neon-accent); border: 1px solid rgba(227,49,208,0.3);">
+              ✨ EPIC & STORY GENERATION
+            </span>
+            <span class="text-muted text-sm">India • Aviation • RBI PA, IT Act §43A</span>
+          </div>
+        </div>
+        <button class="close-btn flex items-center gap-2 text-sm" style="background: var(--bg-surface); padding: 6px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-divider);">
+          <span>&times;</span> Close
+        </button>
+      </div>
+      
+      <div class="modal-body" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-5);">
+        
+        <!-- Story Card 1 -->
+        <div class="card" style="background: var(--bg-surface); border-color: rgba(183,94,184,0.3);">
+          <div class="text-muted text-sm mb-1">RL-2407-012</div>
+          <h3 class="mb-3 text-primary">Link UPI VPA to payment profile</h3>
+          <div class="flex gap-2 mb-4">
+            <span class="badge" style="color: #F59E0B; background: rgba(245,158,11,0.1);">RBI PA §2.4</span>
+            <span class="badge" style="color: var(--color-purple-light); background: rgba(183,94,184,0.1);">India</span>
+            <span class="badge" style="color: #EF4444; background: rgba(239,68,68,0.1);">P1</span>
+          </div>
+          
+          <div class="text-muted text-sm mb-1 uppercase tracking-wide" style="letter-spacing: 0.1em;">USER STORY</div>
+          <p class="text-secondary mb-4 text-sm">As a user, I want to add and verify my UPI VPA so I can make UPI-based payments without re-entering credentials.</p>
+          
+          <div class="text-muted text-sm mb-2 uppercase tracking-wide" style="letter-spacing: 0.1em;">ACCEPTANCE CRITERIA</div>
+          <ul class="text-secondary text-sm mb-4" style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px;">
+            <li class="flex gap-2"><span style="color: #22C55E;">✓</span> NPCI validation in real-time within 3s (RBI PA §2.4 latency mandate)</li>
+            <li class="flex gap-2"><span style="color: #22C55E;">✓</span> VPA masked after 3 chars to prevent exposure (IT Act §43A)</li>
+            <li class="flex gap-2"><span style="color: #22C55E;">✓</span> Failed validation returns specific NPCI error code to UI</li>
+            <li class="flex gap-2"><span style="color: #22C55E;">✓</span> Max 3 retry attempts before temporary lockout</li>
+          </ul>
+          
+          <div class="mb-4 p-3 rounded" style="background: rgba(245,158,11,0.05); border: 1px solid rgba(245,158,11,0.2); border-radius: var(--radius-sm);">
+            <p class="text-sm" style="color: #F59E0B;">⚠️ RBI PA §2.4 — VPA verification against NPCI must complete within a single transaction cycle. Effective Jan 2023.</p>
+          </div>
+          
+          <div class="flex items-center gap-2 mt-auto pt-4" style="border-top: 1px solid var(--border-divider);">
+            <button class="btn btn-primary" style="padding: 6px 12px; font-size: 13px;">Push to JIRA</button>
+            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 13px;">Copy</button>
+            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 13px;">DevOps</button>
+            <button class="btn btn-secondary ml-auto" style="padding: 6px 12px; font-size: 13px; margin-left: auto; border: none;">+ Test cases</button>
+          </div>
+        </div>
+
+        <!-- Story Card 2 -->
+        <div class="card" style="background: var(--bg-surface); border-color: rgba(183,94,184,0.3);">
+          <div class="text-muted text-sm mb-1">RL-2407-013</div>
+          <h3 class="mb-3 text-primary">UPI recurring mandate consent capture</h3>
+          <div class="flex gap-2 mb-4">
+            <span class="badge" style="color: #F59E0B; background: rgba(245,158,11,0.1);">RBI e-Mandate</span>
+            <span class="badge" style="color: var(--color-purple-light); background: rgba(183,94,184,0.1);">India</span>
+            <span class="badge" style="color: #EF4444; background: rgba(239,68,68,0.1);">P1</span>
+          </div>
+          
+          <div class="text-muted text-sm mb-1 uppercase tracking-wide" style="letter-spacing: 0.1em;">USER STORY</div>
+          <p class="text-secondary mb-4 text-sm">As a user, I want to authorise recurring UPI mandates with explicit consent so subscription charges are auto-debited transparently.</p>
+          
+          <div class="text-muted text-sm mb-2 uppercase tracking-wide" style="letter-spacing: 0.1em;">ACCEPTANCE CRITERIA</div>
+          <ul class="text-secondary text-sm mb-4" style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px;">
+            <li class="flex gap-2"><span style="color: #22C55E;">✓</span> Amount, frequency, and validity shown before UPI PIN entry</li>
+            <li class="flex gap-2"><span style="color: #22C55E;">✓</span> Consent timestamp stored for 8 years (RBI record-keeping)</li>
+            <li class="flex gap-2"><span style="color: #22C55E;">✓</span> SMS + in-app notification within 30s of mandate creation</li>
+            <li class="flex gap-2"><span style="color: #22C55E;">✓</span> Revocation accessible within 2 taps at any time</li>
+          </ul>
+          
+          <div class="mb-4 p-3 rounded" style="background: rgba(245,158,11,0.05); border: 1px solid rgba(245,158,11,0.2); border-radius: var(--radius-sm);">
+            <p class="text-sm" style="color: #F59E0B;">⚠️ NPCI UPI e-Mandate Framework — Explicit consent and notification mandatory for all recurring debit authorisations.</p>
+          </div>
+          
+          <div class="flex items-center gap-2 mt-auto pt-4" style="border-top: 1px solid var(--border-divider);">
+            <button class="btn btn-primary" style="padding: 6px 12px; font-size: 13px;">Push to JIRA</button>
+            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 13px;">Copy</button>
+            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 13px;">DevOps</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
